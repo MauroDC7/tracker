@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OfficeMate Tracker — Status</title>
+    <style>
+      :root {
+        --red: #e50012;
+        --label: #6b7280;
+        --border: #e5e7eb;
+        --bg: #f9fafb;
+        --card: #ffffff;
+        --text: #111827;
+        --ok: #16a34a;
+        --warn: #d97706;
+        --err: #dc2626;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        font-size: 14px;
+        padding: 18px;
+      }
+      h1 {
+        margin: 0 0 14px;
+        font-size: 1.05rem;
+        font-weight: 700;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+      }
+      .card h2 {
+        margin: 0 0 10px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--label);
+      }
+      .row { display: flex; justify-content: space-between; gap: 12px; margin: 4px 0; }
+      .row .k { color: var(--label); }
+      .row .v { color: var(--text); text-align: right; word-break: break-all; max-width: 65%; }
+      .pill {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 600;
+      }
+      .pill.ok   { background: rgba(22,163,74,0.12); color: var(--ok); }
+      .pill.warn { background: rgba(217,119,6,0.12); color: var(--warn); }
+      .pill.err  { background: rgba(220,38,38,0.10); color: var(--err); }
+      .pill.idle { background: #f3f4f6; color: var(--label); }
+      .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+      button {
+        background: var(--red);
+        color: #fff;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button.ghost {
+        background: #fff;
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+      button:disabled { opacity: 0.6; cursor: wait; }
+      .small { font-size: 0.8rem; color: var(--label); }
+    </style>
+  </head>
+  <body>
+    <h1>OfficeMate Tracker — Status</h1>
+
+    <div class="card">
+      <h2>Account</h2>
+      <div class="row"><span class="k">Status</span><span class="v" id="authPill"></span></div>
+      <div class="row"><span class="k">E-mail</span><span class="v" id="email">—</span></div>
+      <div class="row"><span class="k">Tracking</span><span class="v" id="trackingPill"></span></div>
+    </div>
+
+    <div class="card">
+      <h2>API</h2>
+      <div class="row"><span class="k">Basis-URL</span><span class="v" id="apiBase">—</span></div>
+      <div class="row"><span class="k">Login-pad</span><span class="v" id="loginPath">—</span></div>
+      <div class="row"><span class="k">Activity-pad</span><span class="v" id="activityPath">—</span></div>
+      <div class="row"><span class="k">Lokale poort</span><span class="v" id="localPort">—</span></div>
+    </div>
+
+    <div class="card">
+      <h2>Actieve venster</h2>
+      <div class="row"><span class="k">App</span><span class="v" id="winApp">—</span></div>
+      <div class="row"><span class="k">Titel</span><span class="v" id="winTitle">—</span></div>
+      <div class="row"><span class="k">Laatst gezien</span><span class="v" id="winAt">—</span></div>
+    </div>
+
+    <div class="card">
+      <h2>Browser-tab (extensie)</h2>
+      <div class="row"><span class="k">URL</span><span class="v" id="bUrl">—</span></div>
+      <div class="row"><span class="k">Titel</span><span class="v" id="bTitle">—</span></div>
+      <div class="row"><span class="k">Domein</span><span class="v" id="bDomain">—</span></div>
+      <div class="row"><span class="k">Laatst gezien</span><span class="v" id="bAt">—</span></div>
+      <p class="small" id="extHint" style="margin-top:8px"></p>
+    </div>
+
+    <div class="card">
+      <h2>Synchronisatie</h2>
+      <div class="row"><span class="k">In wachtrij</span><span class="v" id="queue">0</span></div>
+      <div class="row"><span class="k">Laatste poging</span><span class="v" id="syncAt">—</span></div>
+      <div class="row"><span class="k">Resultaat</span><span class="v" id="syncPill"></span></div>
+      <div class="row"><span class="k">Foutmelding</span><span class="v" id="syncErr">—</span></div>
+      <div class="actions">
+        <button id="syncBtn" type="button">Nu synchroniseren</button>
+        <button id="loginBtn" type="button" class="ghost">Opnieuw aanmelden</button>
+        <button id="logoutBtn" type="button" class="ghost">Uitloggen</button>
+      </div>
+    </div>
+
+    <script>
+      function fmtAgo(iso) {
+        if (!iso) return '—';
+        var d = new Date(iso);
+        var diff = (Date.now() - d.getTime()) / 1000;
+        if (diff < 5) return 'zojuist';
+        if (diff < 60) return Math.round(diff) + ' s geleden';
+        if (diff < 3600) return Math.round(diff / 60) + ' min geleden';
+        return d.toLocaleString();
+      }
+      function setText(id, val) {
+        document.getElementById(id).textContent = (val === null || val === undefined || val === '') ? '—' : String(val);
+      }
+      function pill(id, klass, label) {
+        var el = document.getElementById(id);
+        el.innerHTML = '<span class="pill ' + klass + '">' + label + '</span>';
+      }
+      function render(s) {
+        if (!s) return;
+        pill('authPill', s.authenticated ? 'ok' : 'err', s.authenticated ? 'Ingelogd' : 'Niet ingelogd');
+        setText('email', s.email);
+        pill('trackingPill', s.trackingEnabled ? 'ok' : 'warn', s.trackingEnabled ? 'Aan' : 'Gepauzeerd');
+
+        setText('apiBase', s.apiBaseUrl);
+        setText('loginPath', s.loginPath);
+        setText('activityPath', s.activityPath);
+        setText('localPort', s.localPort);
+
+        setText('winApp', s.lastWindowAppName);
+        setText('winTitle', s.lastWindowTitle);
+        setText('winAt', fmtAgo(s.lastWindowAt));
+
+        setText('bUrl', s.lastBrowserUrl);
+        setText('bTitle', s.lastBrowserTabTitle);
+        setText('bDomain', s.lastBrowserDomain);
+        setText('bAt', fmtAgo(s.lastBrowserAt));
+
+        var hint = document.getElementById('extHint');
+        if (!s.lastBrowserAt) {
+          hint.textContent = 'Geen events ontvangen. Laad de extensie in Chrome en open een tab op een https://-site.';
+        } else {
+          hint.textContent = '';
+        }
+
+        setText('queue', s.queueSize);
+        setText('syncAt', fmtAgo(s.lastSyncAt));
+        if (s.lastSyncOk === null) pill('syncPill', 'idle', 'Nog niet gesynchroniseerd');
+        else if (s.lastSyncOk) pill('syncPill', 'ok', 'Gelukt' + (s.lastSyncCount ? ' (' + s.lastSyncCount + ')' : ''));
+        else pill('syncPill', 'err', 'Mislukt');
+        setText('syncErr', s.lastSyncError);
+      }
+
+      window.omDiag.request().then(render);
+      window.omDiag.onUpdate(render);
+      setInterval(function () { window.omDiag.request().then(render); }, 5000);
+
+      document.getElementById('syncBtn').addEventListener('click', async function () {
+        var btn = this; btn.disabled = true;
+        try { await window.omDiag.syncNow(); } finally { btn.disabled = false; }
+      });
+      document.getElementById('loginBtn').addEventListener('click', function () {
+        window.omDiag.openLogin();
+      });
+      document.getElementById('logoutBtn').addEventListener('click', async function () {
+        await window.omDiag.logout();
+      });
+    </script>
+  </body>
+</html>

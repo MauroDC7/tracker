@@ -1,5 +1,6 @@
 import { BrowserWindow, app } from 'electron';
 import * as path from 'node:path';
+import { loadDockIcon } from './tray-icon';
 
 let win: BrowserWindow | null = null;
 
@@ -27,12 +28,14 @@ export function openLoginWindow(): BrowserWindow {
     ? path.join(process.resourcesPath, 'static', 'login.html')
     : path.join(__dirname, '../../static', 'login.html');
 
+  const appIcon = loadDockIcon();
   win = new BrowserWindow({
     width: 440,
     height: 520,
     show: false,
     autoHideMenuBar: true,
     title: 'OfficeMate Tracker — Sign in',
+    ...(appIcon ? { icon: appIcon } : {}),
     webPreferences: {
       preload,
       contextIsolation: true,

@@ -1,17 +1,18 @@
-import { Menu, Tray, nativeImage, type NativeImage } from 'electron';
-import * as fs from 'node:fs';
-import * as path from 'node:path';
-import { createTrayImage } from './tray-icon';
+import { Menu, Tray, type NativeImage } from 'electron';
+import { loadTrayIcon } from './tray-icon';
+import { showMainWindow } from './show-main-window';
 import type { DiagnosticsService } from '../services/diagnostics-service';
 
 export interface TrayControllerDeps {
   diagnostics: DiagnosticsService;
+  isAuthenticated: () => boolean;
   isTracking: () => boolean;
   setTracking: (v: boolean) => void;
   isOpenAtLogin: () => boolean;
   setOpenAtLogin: (v: boolean) => void;
   openLogin: () => void;
   openDiagnostics: () => void;
+  onLogout: () => void;
   syncNow: () => void;
   onQuit: () => void | Promise<void>;
 }
@@ -27,15 +28,18 @@ export interface TrayController {
  * de gebruiker direct weet of de tracker werkt.
  */
 export function createTray(deps: TrayControllerDeps): TrayController {
-  let icon: NativeImage = createTrayImage();
-  const devIcon = path.join(__dirname, '../../assets/icon.png');
-  if (fs.existsSync(devIcon)) {
-    const alt = nativeImage.createFromPath(devIcon);
-    if (!alt.isEmpty()) icon = alt;
-  }
+  const icon: NativeImage = loadTrayIcon();
 
   const tray = new Tray(icon);
   tray.setToolTip('OfficeMate Tracker');
+
+  // Linkerklik: hoofdvenster. Rechtsklik: menu.
+  tray.on('click', () => {
+    showMainWindow(deps.isAuthenticated());
+  });
+  tray.on('right-click', () => {
+    tray.popUpContextMenu();
+  });
 
   const rebuild = () => {
     const s = deps.diagnostics.get();
@@ -86,6 +90,9 @@ export function createTray(deps: TrayControllerDeps): TrayController {
         label: s.authenticated ? 'Opnieuw aanmelden…' : 'Aanmelden…',
         click: () => deps.openLogin(),
       },
+      ...(s.authenticated
+        ? [{ label: 'Uitloggen', click: () => deps.onLogout() }]
+        : []),
       { type: 'separator' },
       {
         label: 'Starten bij aanmelden',

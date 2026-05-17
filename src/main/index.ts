@@ -7,7 +7,7 @@
  * - Durable disk queue + periodic Axios batches to Laravel (offline-safe).
  * - Auth token in userData with OS encryption when `safeStorage` is available.
  */
-import { app } from 'electron';
+import { app, Menu } from 'electron';
 import { env } from '../utils/env';
 import { logger } from '../utils/logger';
 import { ActivityQueue } from '../storage/activity-queue';
@@ -21,8 +21,10 @@ import { DiagnosticsService } from '../services/diagnostics-service';
 import { TrackingCoordinator } from '../trackers/tracking-coordinator';
 import { registerIpcAuth, registerIpcDiagnostics } from '../ipc/register-ipc';
 import { createTray, type TrayController } from './tray-menu';
+import { loadDockIcon } from './tray-icon';
 import { openLoginWindow } from './login-window';
 import { openDiagnosticsWindow } from './diagnostics-window';
+import { showMainWindow } from './show-main-window';
 import type { Tray } from 'electron';
 
 export class OfficeMateApp {
@@ -82,12 +84,19 @@ export class OfficeMateApp {
 
     this.trayController = createTray({
       diagnostics: this.diagnostics,
+      isAuthenticated: () => this.auth.isAuthenticated(),
       isTracking: () => this.settings.trackingEnabled,
       setTracking: (v) => this.setTrackingEnabled(v),
       isOpenAtLogin: () => this.settings.openAtLogin,
       setOpenAtLogin: (v) => this.setOpenAtLogin(v),
       openLogin: () => openLoginWindow(),
       openDiagnostics: () => openDiagnosticsWindow(),
+      onLogout: () => {
+        this.auth.logout();
+        this.diagnostics.setAuth(false, null);
+        this.trayController?.refresh();
+        openLoginWindow();
+      },
       syncNow: () => void this.sync.flushOnce(),
       onQuit: () => {
         app.quit();
@@ -97,11 +106,20 @@ export class OfficeMateApp {
 
     if (!this.auth.isAuthenticated()) {
       openLoginWindow();
+    } else {
+      logger.info(
+        'Ingelogd — klik op Electron in het dock (of menubalk-icoon) om Status te openen',
+      );
     }
 
     logger.info(
       `OfficeMate Tracker started — API ${env.remoteApiBaseUrl}${env.remoteLoginPath}`,
     );
+  }
+
+  /** Dock-klik / Opnieuw activeren: toon status of login. */
+  focusMainWindow(): void {
+    showMainWindow(this.auth.isAuthenticated());
   }
 
   async shutdown(): Promise<void> {
@@ -155,7 +173,11 @@ if (!gotLock) {
   let isQuitting = false;
 
   app.on('second-instance', () => {
-    logger.info('Second instance attempted; focusing is not required for tray MVP');
+    core?.focusMainWindow();
+  });
+
+  app.on('activate', () => {
+    core?.focusMainWindow();
   });
 
   /** Without a listener, Windows/Linux quit when the last window (e.g. login) closes. */
@@ -165,8 +187,45 @@ if (!gotLock) {
 
   app.whenReady().then(async () => {
     if (process.platform === 'darwin') {
-      // Verberg dock-icoon — app leeft volledig in de menu bar (tray)
-      app.dock?.hide();
+      // Dock zichtbaar houden zodat de app vindbaar is (menubalk-icoon kan onzichtbaar zijn).
+      const dockIcon = loadDockIcon();
+      if (dockIcon) app.dock?.setIcon(dockIcon);
+
+      const dockMenu = Menu.buildFromTemplate([
+        {
+          label: 'Status openen',
+          click: () => core?.focusMainWindow(),
+        },
+        {
+          label: 'Aanmelden…',
+          click: () => openLoginWindow(),
+        },
+        { type: 'separator' },
+        { label: 'Afsluiten', click: () => app.quit() },
+      ]);
+      app.dock?.setMenu(dockMenu);
+
+      Menu.setApplicationMenu(
+        Menu.buildFromTemplate([
+          {
+            label: 'OfficeMate Tracker',
+            submenu: [
+              {
+                label: 'Status openen',
+                accelerator: 'CmdOrCtrl+Shift+S',
+                click: () => core?.focusMainWindow(),
+              },
+              {
+                label: 'Aanmelden…',
+                click: () => openLoginWindow(),
+              },
+              { type: 'separator' },
+              { role: 'quit', label: 'Afsluiten' },
+            ],
+          },
+          { role: 'editMenu' },
+        ]),
+      );
 
       // macOS vereist expliciete Accessibility-toestemming voor active-win.
       // systemPreferences is beschikbaar maar de check zelf is async via

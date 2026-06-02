@@ -13,9 +13,10 @@
     "start": "npm run build && electron .",
     "dev": "concurrently \"npm run watch\" \"wait-on dist/main/index.js && electron .\"",
     "pack": "npm run build && electron-builder --dir",
-    "dist:win": "npm run build && electron-builder --win",
-    "dist:mac": "npm run build && electron-builder --mac",
-    "dist:all": "npm run build && electron-builder --win --mac",
+    "dist:win": "node scripts/prepare-release.js && npm run build && electron-builder --win",
+    "dist:mac": "node scripts/prepare-release.js && xattr -cr assets static node_modules/active-win 2>/dev/null; npm run build && electron-builder --mac",
+    "dist:all": "node scripts/prepare-release.js && npm run build && electron-builder --win --mac",
+    "release:prepare": "node scripts/prepare-release.js",
     "icons": "node scripts/sync-icons.js",
     "prebuild": "npm run icons",
     "prestart": "npm run icons",
@@ -37,6 +38,7 @@
   "build": {
     "appId": "app.officemate.tracker",
     "productName": "OfficeMate Tracker",
+    "npmRebuild": false,
     "directories": {
       "output": "release"
     },
@@ -44,12 +46,20 @@
       "dist/**/*",
       "static/**/*",
       "assets/**/*",
-      "package.json"
+      "package.json",
+      "node_modules/active-win/**/*"
+    ],
+    "asarUnpack": [
+      "node_modules/active-win/**"
     ],
     "extraResources": [
       {
         "from": "static",
         "to": "static"
+      },
+      {
+        "from": ".env.release",
+        "to": ".env"
       }
     ],
     "win": {
@@ -91,8 +101,9 @@
       ],
       "category": "public.app-category.productivity",
       "artifactName": "${productName}-${version}-${arch}.${ext}",
+      "identity": null,
       "entitlementsInherit": "build/entitlements.mac.plist",
-      "hardenedRuntime": true,
+      "hardenedRuntime": false,
       "gatekeeperAssess": false
     },
     "linux": {

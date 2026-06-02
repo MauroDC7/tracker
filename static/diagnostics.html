@@ -4,10 +4,10 @@
     <meta charset="UTF-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OfficeMate Tracker — Status</title>
+    <title>TimeTraq Tracker — Status</title>
     <style>
       :root {
         --red: #e50012;
@@ -29,8 +29,22 @@
         font-size: 14px;
         padding: 18px;
       }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .brand img {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+        flex-shrink: 0;
+      }
+
       h1 {
-        margin: 0 0 14px;
+        margin: 0;
         font-size: 1.05rem;
         font-weight: 700;
       }
@@ -83,7 +97,10 @@
     </style>
   </head>
   <body>
-    <h1>OfficeMate Tracker — Status</h1>
+    <div class="brand">
+      <img src="logo.png" width="28" height="28" alt="" />
+      <h1>TimeTraq Tracker — Status</h1>
+    </div>
 
     <div class="card">
       <h2>Account</h2>
@@ -97,7 +114,6 @@
       <div class="row"><span class="k">Basis-URL</span><span class="v" id="apiBase">—</span></div>
       <div class="row"><span class="k">Login-pad</span><span class="v" id="loginPath">—</span></div>
       <div class="row"><span class="k">Activity-pad</span><span class="v" id="activityPath">—</span></div>
-      <div class="row"><span class="k">Lokale poort</span><span class="v" id="localPort">—</span></div>
     </div>
 
     <div class="card">
@@ -105,15 +121,6 @@
       <div class="row"><span class="k">App</span><span class="v" id="winApp">—</span></div>
       <div class="row"><span class="k">Titel</span><span class="v" id="winTitle">—</span></div>
       <div class="row"><span class="k">Laatst gezien</span><span class="v" id="winAt">—</span></div>
-    </div>
-
-    <div class="card">
-      <h2>Browser-tab (extensie)</h2>
-      <div class="row"><span class="k">URL</span><span class="v" id="bUrl">—</span></div>
-      <div class="row"><span class="k">Titel</span><span class="v" id="bTitle">—</span></div>
-      <div class="row"><span class="k">Domein</span><span class="v" id="bDomain">—</span></div>
-      <div class="row"><span class="k">Laatst gezien</span><span class="v" id="bAt">—</span></div>
-      <p class="small" id="extHint" style="margin-top:8px"></p>
     </div>
 
     <div class="card">
@@ -155,23 +162,10 @@
         setText('apiBase', s.apiBaseUrl);
         setText('loginPath', s.loginPath);
         setText('activityPath', s.activityPath);
-        setText('localPort', s.localPort);
 
         setText('winApp', s.lastWindowAppName);
         setText('winTitle', s.lastWindowTitle);
         setText('winAt', fmtAgo(s.lastWindowAt));
-
-        setText('bUrl', s.lastBrowserUrl);
-        setText('bTitle', s.lastBrowserTabTitle);
-        setText('bDomain', s.lastBrowserDomain);
-        setText('bAt', fmtAgo(s.lastBrowserAt));
-
-        var hint = document.getElementById('extHint');
-        if (!s.lastBrowserAt) {
-          hint.textContent = 'Geen events ontvangen. Laad de extensie in Chrome en open een tab op een https://-site.';
-        } else {
-          hint.textContent = '';
-        }
 
         setText('queue', s.queueSize);
         setText('syncAt', fmtAgo(s.lastSyncAt));

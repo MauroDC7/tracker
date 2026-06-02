@@ -2,7 +2,7 @@
 
 ## Purpose limitation
 
-OfficeMate Tracker exists to help organizations understand **time spent in applications and active browser contexts** for workforce analytics, billing, or compliance workflows. It is **not** designed for covert surveillance: it avoids content capture by design.
+OfficeMate Tracker exists to help organizations understand **time spent in applications** for workforce analytics, billing, or compliance workflows. It is **not** designed for covert surveillance: it avoids content capture by design.
 
 ## Lawful basis (GDPR)
 
@@ -15,7 +15,7 @@ You should record the chosen basis in your Records of Processing Activities and 
 
 ## Data categories
 
-**Personal data** may include window titles and URLs, which can reveal health, union membership, religion, or other special categories if employees visit sensitive sites. **Metadata-only tracking reduces risk versus full page capture**, but it is not zero risk. Mitigations:
+**Personal data** may include window titles, which can reveal health, union membership, religion, or other special categories if employees visit sensitive sites. **Metadata-only tracking reduces risk versus full page capture**, but it is not zero risk. Mitigations:
 
 - Transparent policy and in-product notice.
 - Purpose limitation (no selling, no unrelated analytics).
@@ -29,16 +29,8 @@ You should record the chosen basis in your Records of Processing Activities and 
 | Keystroke logging | **Not implemented** |
 | Screenshots / screen recording | **Not implemented** |
 | Page HTML / DOM scraping | **Not implemented** |
-| Background tab surveillance | **Not implemented** — extension reports **active tab in focused window** only |
-| Incognito tracking | **Skipped** in the extension and ignored server-side ingest |
-
-## Chrome extension behavior
-
-The MV3 service worker:
-
-- Reads **tab URL and title** for the **active** tab in the **last focused** normal (non-incognito) window.
-- Sends JSON to **localhost** only.
-- Does not inject content scripts and does not request `<all_urls>`.
+| Browser URL / tab tracking | **Not implemented** |
+| Background tab surveillance | **Not implemented** |
 
 ## Employee transparency
 
@@ -66,8 +58,6 @@ If EU employees’ metadata is stored outside the EEA, apply Chapter V GDPR tool
 
 Spyware is characterized by concealment, excessive permissions, and exfiltration beyond disclosed purpose. This project:
 
-- uses **narrow** extension permissions,
-- binds the local receiver to **loopback**,
 - documents behavior in `README.md` and this file,
 
 and should only be deployed with **explicit organizational authorization** and user notice.

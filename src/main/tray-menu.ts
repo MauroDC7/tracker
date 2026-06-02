@@ -59,17 +59,12 @@ export function createTray(deps: TrayControllerDeps): TrayController {
 
     const queueLabel = `Wachtrij: ${s.queueSize}`;
 
-    const browserLabel = s.lastBrowserDomain
-      ? `Tab: ${truncate(s.lastBrowserDomain, 30)}`
-      : 'Tab: (extensie nog niet actief)';
-
     const menu = Menu.buildFromTemplate([
       { label: 'OfficeMate Tracker', enabled: false },
       { type: 'separator' },
       { label: statusLabel, enabled: false },
       { label: queueLabel, enabled: false },
       { label: syncLabel, enabled: false },
-      { label: browserLabel, enabled: false },
       { type: 'separator' },
       {
         label: tracking ? 'Tracking pauzeren' : 'Tracking hervatten',

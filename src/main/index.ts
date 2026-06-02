@@ -3,7 +3,6 @@
  *
  * Architecture (MVP):
  * - Foreground window metadata via `active-win` on a fixed poll interval.
- * - Browser URL/title via local MV3 extension POSTing to loopback HTTP (no native messaging).
  * - Durable disk queue + periodic Axios batches to Laravel (offline-safe).
  * - Auth token in userData with OS encryption when `safeStorage` is available.
  */
@@ -13,8 +12,6 @@ import { logger } from '../utils/logger';
 import { ActivityQueue } from '../storage/activity-queue';
 import { loadSettings, saveSettings, type TrackerSettings } from '../storage/tracker-settings';
 import { AuthService } from '../services/auth-service';
-import { BrowserStateService } from '../services/browser-state';
-import { LocalBrowserServer } from '../services/local-browser-server';
 import { RemoteApiClient } from '../api/remote-api-client';
 import { SyncService } from '../services/sync-service';
 import { DiagnosticsService } from '../services/diagnostics-service';
@@ -35,10 +32,7 @@ export class OfficeMateApp {
     apiBaseUrl: env.remoteApiBaseUrl,
     loginPath: env.remoteLoginPath,
     activityPath: env.remoteActivityPath,
-    localPort: env.localBrowserApiPort,
   });
-  private readonly browserState = new BrowserStateService();
-  private readonly localServer = new LocalBrowserServer(this.browserState);
   private readonly remote = new RemoteApiClient();
   private readonly sync = new SyncService(
     this.queue,
@@ -48,7 +42,6 @@ export class OfficeMateApp {
   );
   private readonly coordinator = new TrackingCoordinator(
     this.queue,
-    this.browserState,
     env.activeWindowPollMs,
     () => this.auth.getUserId(),
     () => this.settings.trackingEnabled,
@@ -59,7 +52,6 @@ export class OfficeMateApp {
   private trayController: TrayController | null = null;
 
   async start(): Promise<void> {
-    this.browserState.attachDiagnostics(this.diagnostics);
     this.diagnostics.setAuth(this.auth.isAuthenticated(), this.auth.getEmail() ?? null);
     this.diagnostics.setTracking(this.settings.trackingEnabled);
     this.diagnostics.setQueueSize(this.queue.size());
@@ -77,7 +69,6 @@ export class OfficeMateApp {
       },
     });
 
-    await this.localServer.start();
     this.applyOpenAtLogin();
     this.sync.start();
     this.refreshTrackingLoop();
@@ -127,7 +118,6 @@ export class OfficeMateApp {
     this.coordinator.stop();
     this.sync.stop();
     await this.sync.flushQueueBestEffort();
-    await this.localServer.stop();
   }
 
   private refreshTrackingLoop(): void {

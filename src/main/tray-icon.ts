@@ -9,8 +9,12 @@ const PNG_1PX = Buffer.from(
   'base64',
 );
 
-/** Nieuwste logo eerst; icon.png is kopie voor builds (npm run icons). */
-const CANDIDATE_FILES = ['Tracker Icons.png', 'icon.png', 'tracker-icon.png'];
+/** Gegenereerd door npm run icons; bron: Logo.png / logoTransparent.png */
+const TRAY_FILES = ['tray-icon.png', 'icon.png', 'Logo.png', 'logoTransparent.png'];
+const DOCK_FILES = ['icon.png', 'Logo.png', 'logoTransparent.png'];
+
+/** macOS menubalk: 16pt logisch, 32px @2x (Apple HIG). */
+const TRAY_LOGICAL_PX = 16;
 
 function assetDirs(): string[] {
   const dirs: string[] = [];
@@ -21,9 +25,9 @@ function assetDirs(): string[] {
   return dirs;
 }
 
-function findIconPath(): string | null {
+function findAsset(candidates: string[]): string | null {
   for (const dir of assetDirs()) {
-    for (const file of CANDIDATE_FILES) {
+    for (const file of candidates) {
       const p = path.join(dir, file);
       if (fs.existsSync(p)) return p;
     }
@@ -31,9 +35,7 @@ function findIconPath(): string | null {
   return null;
 }
 
-function loadRawIcon(): NativeImage | null {
-  const p = findIconPath();
-  if (!p) return null;
+function loadFromPath(p: string): NativeImage | null {
   const img = nativeImage.createFromPath(p);
   if (img.isEmpty()) {
     logger.warn(`App-icoon leeg of onleesbaar: ${p}`);
@@ -43,11 +45,15 @@ function loadRawIcon(): NativeImage | null {
   return img;
 }
 
-/** Menubalk: 22pt + Retina 44pt; gekleurd logo (rood) blijft zichtbaar. */
+/** Menubalk: 16×16 logisch + 32×32 @2x (tray-icon.png is al 32px bron). */
 function scaleForTray(img: NativeImage): NativeImage {
-  const size = 22;
+  const size = TRAY_LOGICAL_PX;
+  const { width } = img.getSize();
+  const retina =
+    width === size * 2
+      ? img
+      : img.resize({ width: size * 2, height: size * 2, quality: 'best' });
   const out = img.resize({ width: size, height: size, quality: 'best' });
-  const retina = img.resize({ width: size * 2, height: size * 2, quality: 'best' });
   out.addRepresentation({
     scaleFactor: 2,
     width: size * 2,
@@ -59,16 +65,23 @@ function scaleForTray(img: NativeImage): NativeImage {
 }
 
 export function loadTrayIcon(): NativeImage {
-  const img = loadRawIcon();
-  if (img) return scaleForTray(img);
-  logger.warn('Geen logo in assets/ — plaats Tracker Icons.png of icon.png');
+  const p = findAsset(TRAY_FILES);
+  if (p) {
+    const img = loadFromPath(p);
+    if (img) return scaleForTray(img);
+  }
+  logger.warn('Geen tray-icoon — run npm run icons (Logo.png in assets/)');
   return nativeImage.createFromBuffer(PNG_1PX);
 }
 
-/** Dock en vensters: scherper op Retina-schermen. */
+/** Dock en vensters: 128×128 vanuit 512px build-icoon. */
 export function loadDockIcon(): NativeImage | null {
-  const img = loadRawIcon();
+  const p = findAsset(DOCK_FILES);
+  if (!p) return null;
+  const img = loadFromPath(p);
   if (!img) return null;
+  const { width, height } = img.getSize();
+  if (width <= 128 && height <= 128) return img;
   return img.resize({ width: 128, height: 128, quality: 'best' });
 }
 

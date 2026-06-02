@@ -1,26 +1,20 @@
 import type { ActivityPayload } from '../types';
 import { ActivityQueue } from '../storage/activity-queue';
-import { BrowserStateService } from '../services/browser-state';
 import type { DiagnosticsService } from '../services/diagnostics-service';
 import { readForegroundWindow } from './active-window-reader';
-import { isLikelyBrowserProcess } from './browser-process';
 import { logger } from '../utils/logger';
 
 interface OpenSegment {
   started_at: Date;
   app_name: string;
   window_title: string;
-  browser_url: string | null;
-  browser_domain: string | null;
-  browser_tab_title: string | null;
 }
 
 /**
  * Polls foreground window on an interval. When the composite "fingerprint" changes,
  * the previous open segment is finalized into the durable queue.
  *
- * Fingerprint = app + window title + (optional) browser URL/title when the foreground
- * app is a browser and the extension has recently reported the active tab.
+ * Fingerprint = app + window title.
  */
 export class TrackingCoordinator {
   private timer: NodeJS.Timeout | null = null;
@@ -29,7 +23,6 @@ export class TrackingCoordinator {
 
   constructor(
     private queue: ActivityQueue,
-    private browserState: BrowserStateService,
     private pollMs: number,
     private getUserId: () => number | undefined,
     private isEnabled: () => boolean,
@@ -69,23 +62,10 @@ export class TrackingCoordinator {
     this.diagnostics?.setWindow(fg.app_name, fg.window_title);
     this.diagnostics?.setQueueSize(this.queue.size());
 
-    const browserFresh = isLikelyBrowserProcess(fg.app_name)
-      ? this.browserState.getFresh(now, 20_000)
-      : null;
-
-    const browser_url = browserFresh?.url ?? null;
-    const browser_domain = browserFresh?.domain ?? null;
-    const browser_tab_title = browserFresh?.title ?? null;
-
-    const key = [
-      fg.app_name,
-      fg.window_title,
-      browser_url || '',
-      browser_tab_title || '',
-    ].join('\u0001');
+    const key = [fg.app_name, fg.window_title].join('\u0001');
 
     if (this.lastKey === null) {
-      this.open = this.startSegment(now, fg, browser_url, browser_domain, browser_tab_title);
+      this.open = this.startSegment(now, fg);
       this.lastKey = key;
       return;
     }
@@ -97,24 +77,18 @@ export class TrackingCoordinator {
       if (payload.duration_seconds > 0) this.queue.enqueue(payload);
     }
 
-    this.open = this.startSegment(now, fg, browser_url, browser_domain, browser_tab_title);
+    this.open = this.startSegment(now, fg);
     this.lastKey = key;
   }
 
   private startSegment(
     started: Date,
     fg: { app_name: string; window_title: string },
-    browser_url: string | null,
-    browser_domain: string | null,
-    browser_tab_title: string | null,
   ): OpenSegment {
     return {
       started_at: started,
       app_name: fg.app_name,
       window_title: fg.window_title,
-      browser_url,
-      browser_domain,
-      browser_tab_title,
     };
   }
 
@@ -125,9 +99,9 @@ export class TrackingCoordinator {
       user_id: this.getUserId(),
       app_name: seg.app_name,
       window_title: seg.window_title,
-      browser_url: seg.browser_url,
-      browser_domain: seg.browser_domain,
-      browser_tab_title: seg.browser_tab_title,
+      browser_url: null,
+      browser_domain: null,
+      browser_tab_title: null,
       started_at: seg.started_at.toISOString(),
       ended_at: ended.toISOString(),
       duration_seconds,

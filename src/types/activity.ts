@@ -15,15 +15,6 @@ export interface ActivityPayload {
   duration_seconds: number;
 }
 
-export interface BrowserEventDto {
-  url: string;
-  title: string;
-  domain: string;
-  is_incognito: boolean;
-  /** ISO timestamp when extension observed the change */
-  observed_at: string;
-}
-
 export interface LoginCredentials {
   email: string;
   password: string;

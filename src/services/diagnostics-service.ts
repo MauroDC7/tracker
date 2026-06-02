@@ -2,7 +2,6 @@
  * Centraal verzamelpunt voor alle "werkt het?"-status:
  * - login + email
  * - laatste actieve venster
- * - laatste browser-tab event (van extensie)
  * - queue-grootte
  * - laatste sync (success / error)
  *
@@ -17,16 +16,10 @@ export interface DiagnosticsSnapshot {
   apiBaseUrl: string;
   loginPath: string;
   activityPath: string;
-  localPort: number;
 
   lastWindowAppName: string | null;
   lastWindowTitle: string | null;
   lastWindowAt: string | null;
-
-  lastBrowserUrl: string | null;
-  lastBrowserTabTitle: string | null;
-  lastBrowserDomain: string | null;
-  lastBrowserAt: string | null;
 
   queueSize: number;
   lastSyncAt: string | null;
@@ -40,7 +33,7 @@ export interface DiagnosticsSnapshot {
 export class DiagnosticsService extends EventEmitter {
   private snap: DiagnosticsSnapshot;
 
-  constructor(initial: Pick<DiagnosticsSnapshot, 'apiBaseUrl' | 'loginPath' | 'activityPath' | 'localPort'>) {
+  constructor(initial: Pick<DiagnosticsSnapshot, 'apiBaseUrl' | 'loginPath' | 'activityPath'>) {
     super();
     this.snap = {
       authenticated: false,
@@ -48,16 +41,10 @@ export class DiagnosticsService extends EventEmitter {
       apiBaseUrl: initial.apiBaseUrl,
       loginPath: initial.loginPath,
       activityPath: initial.activityPath,
-      localPort: initial.localPort,
 
       lastWindowAppName: null,
       lastWindowTitle: null,
       lastWindowAt: null,
-
-      lastBrowserUrl: null,
-      lastBrowserTabTitle: null,
-      lastBrowserDomain: null,
-      lastBrowserAt: null,
 
       queueSize: 0,
       lastSyncAt: null,
@@ -87,15 +74,6 @@ export class DiagnosticsService extends EventEmitter {
       lastWindowAppName: app_name,
       lastWindowTitle: window_title,
       lastWindowAt: new Date().toISOString(),
-    });
-  }
-
-  setBrowser(url: string, title: string, domain: string): void {
-    this.update({
-      lastBrowserUrl: url,
-      lastBrowserTabTitle: title,
-      lastBrowserDomain: domain,
-      lastBrowserAt: new Date().toISOString(),
     });
   }
 

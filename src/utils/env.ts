@@ -54,7 +54,6 @@ export const env = {
     'https://api.officemate.app',
   remoteActivityPath: process.env.REMOTE_ACTIVITY_PATH || '/api/activity',
   remoteLoginPath: process.env.REMOTE_LOGIN_PATH || '/api/login',
-  localBrowserApiPort: num('LOCAL_BROWSER_API_PORT', 3210),
   activeWindowPollMs: num('ACTIVE_WINDOW_POLL_MS', 5000),
   syncIntervalMs: num('SYNC_INTERVAL_MS', 60_000),
   syncBatchSize: num('SYNC_BATCH_SIZE', 50),

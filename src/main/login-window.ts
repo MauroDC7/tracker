@@ -31,9 +31,10 @@ export function openLoginWindow(): BrowserWindow {
   const appIcon = loadDockIcon();
   win = new BrowserWindow({
     width: 440,
-    height: 520,
+    height: 560,
     show: false,
     autoHideMenuBar: true,
+    backgroundColor: '#f4f4f5',
     title: 'OfficeMate Tracker — Sign in',
     ...(appIcon ? { icon: appIcon } : {}),
     webPreferences: {

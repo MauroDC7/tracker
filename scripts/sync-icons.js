@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Genereert alle app-iconen vanuit het OfficeMate-logo in assets/.
+ * Genereert alle app-iconen vanuit het Timmetraq-logo in assets/.
  * Past iOS-achtige afgeronde hoeken toe (squircle ~22%).
  *
  * Bron (eerste die bestaat): Logo.png → logoTransparent.png

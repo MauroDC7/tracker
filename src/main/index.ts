@@ -1,5 +1,5 @@
 /**
- * OfficeMate Tracker — main process bootstrap.
+ * Timmetraq Tracker — main process bootstrap.
  *
  * Architecture (MVP):
  * - Foreground window metadata via `active-win` on a fixed poll interval.
@@ -24,7 +24,7 @@ import { openDiagnosticsWindow } from './diagnostics-window';
 import { showMainWindow } from './show-main-window';
 import type { Tray } from 'electron';
 
-export class OfficeMateApp {
+export class TimmetraqTrackerApp {
   private settings: TrackerSettings = loadSettings();
   private readonly queue = new ActivityQueue();
   private readonly auth = new AuthService();
@@ -104,7 +104,7 @@ export class OfficeMateApp {
     }
 
     logger.info(
-      `OfficeMate Tracker started — API ${env.remoteApiBaseUrl}${env.remoteLoginPath}`,
+      `Timmetraq Tracker started — API ${env.remoteApiBaseUrl}${env.remoteLoginPath}`,
     );
   }
 
@@ -159,7 +159,7 @@ const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
   app.quit();
 } else {
-  let core: OfficeMateApp | null = null;
+  let core: TimmetraqTrackerApp | null = null;
   let isQuitting = false;
 
   app.on('second-instance', () => {
@@ -198,7 +198,7 @@ if (!gotLock) {
       Menu.setApplicationMenu(
         Menu.buildFromTemplate([
           {
-            label: 'OfficeMate Tracker',
+            label: 'Timmetraq Tracker',
             submenu: [
               {
                 label: 'Status openen',
@@ -217,23 +217,17 @@ if (!gotLock) {
         ]),
       );
 
-      // macOS vereist expliciete Accessibility-toestemming voor active-win.
-      // systemPreferences is beschikbaar maar de check zelf is async via
-      // een native prompt — we loggen alleen een waarschuwing zodat de
-      // gebruiker weet wat te doen als venstertitels leeg blijven.
-      const { systemPreferences } = await import('electron');
-      const trusted = systemPreferences.isTrustedAccessibilityClient(false);
-      if (!trusted) {
+      // Toegankelijkheid: alleen loggen bij start — geen isTrustedAccessibilityClient(true),
+      // dat toont bij elke start opnieuw het dialoog (ook na toestemming in instellingen).
+      const { isMacAccessibilityTrusted } = await import('../utils/mac-accessibility');
+      if (!isMacAccessibilityTrusted()) {
         logger.warn(
-          'macOS: Accessibility-toegang niet verleend. ' +
-          'Ga naar Systeeminstellingen → Privacy & Beveiliging → Toegankelijkheid ' +
-          'en voeg OfficeMate Tracker toe. Venster-tracking werkt mogelijk niet volledig.',
+          'macOS: Toegankelijkheid niet actief. Tray → "Toegankelijkheid instellen…" ' +
+            'of Systeeminstellingen → Privacy → Toegankelijkheid → Timmetraq Tracker.',
         );
-        // Vraag de toestemming aan — macOS toont een systeemdialoog
-        systemPreferences.isTrustedAccessibilityClient(true);
       }
     }
-    core = new OfficeMateApp();
+    core = new TimmetraqTrackerApp();
     await core.start();
   });
 

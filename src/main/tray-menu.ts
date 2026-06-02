@@ -2,6 +2,10 @@ import { Menu, Tray, type NativeImage } from 'electron';
 import { loadTrayIcon } from './tray-icon';
 import { showMainWindow } from './show-main-window';
 import type { DiagnosticsService } from '../services/diagnostics-service';
+import {
+  isMacAccessibilityTrusted,
+  promptMacAccessibilitySettings,
+} from '../utils/mac-accessibility';
 
 export interface TrayControllerDeps {
   diagnostics: DiagnosticsService;
@@ -31,7 +35,7 @@ export function createTray(deps: TrayControllerDeps): TrayController {
   const icon: NativeImage = loadTrayIcon();
 
   const tray = new Tray(icon);
-  tray.setToolTip('OfficeMate Tracker');
+  tray.setToolTip('Timmetraq Tracker');
 
   // Linkerklik: hoofdvenster. Rechtsklik: menu.
   tray.on('click', () => {
@@ -60,7 +64,7 @@ export function createTray(deps: TrayControllerDeps): TrayController {
     const queueLabel = `Wachtrij: ${s.queueSize}`;
 
     const menu = Menu.buildFromTemplate([
-      { label: 'OfficeMate Tracker', enabled: false },
+      { label: 'Timmetraq Tracker', enabled: false },
       { type: 'separator' },
       { label: statusLabel, enabled: false },
       { label: queueLabel, enabled: false },
@@ -81,6 +85,14 @@ export function createTray(deps: TrayControllerDeps): TrayController {
         label: 'Status openen…',
         click: () => deps.openDiagnostics(),
       },
+      ...(process.platform === 'darwin' && !isMacAccessibilityTrusted()
+        ? [
+            {
+              label: 'Toegankelijkheid instellen…',
+              click: () => promptMacAccessibilitySettings(),
+            },
+          ]
+        : []),
       {
         label: s.authenticated ? 'Opnieuw aanmelden…' : 'Aanmelden…',
         click: () => deps.openLogin(),
@@ -107,7 +119,7 @@ export function createTray(deps: TrayControllerDeps): TrayController {
     tray.setContextMenu(menu);
 
     tray.setToolTip(
-      `OfficeMate Tracker — ${s.authenticated ? 'ingelogd' : 'niet ingelogd'}, wachtrij ${s.queueSize}`,
+      `Timmetraq Tracker — ${s.authenticated ? 'ingelogd' : 'niet ingelogd'}, wachtrij ${s.queueSize}`,
     );
   };
 

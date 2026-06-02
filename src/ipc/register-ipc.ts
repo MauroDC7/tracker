@@ -80,7 +80,7 @@ function formatLoginError(e: unknown): string {
     if (status === 401 || status === 403) {
       return (
         apiMsg ||
-        'Onjuiste e-mail of wachtwoord. Gebruik hetzelfde account als op officemate.test (of registreer eerst).'
+        'Onjuiste e-mail of wachtwoord. Gebruik hetzelfde account als op timetraq.be (of registreer eerst).'
       );
     }
     if (status === 404) return 'Login-endpoint niet gevonden (404). Klopt REMOTE_LOGIN_PATH?';

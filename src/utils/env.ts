@@ -51,7 +51,7 @@ function num(name: string, fallback: number): number {
 export const env = {
   remoteApiBaseUrl:
     process.env.REMOTE_API_BASE_URL?.replace(/\/$/, '') ||
-    'https://api.officemate.app',
+    'https://timetraq.be',
   remoteActivityPath: process.env.REMOTE_ACTIVITY_PATH || '/api/activity',
   remoteLoginPath: process.env.REMOTE_LOGIN_PATH || '/api/login',
   activeWindowPollMs: num('ACTIVE_WINDOW_POLL_MS', 5000),

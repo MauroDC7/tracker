@@ -1,10 +1,10 @@
 {
-  "name": "officemate-tracker",
-  "productName": "OfficeMate Tracker",
+  "name": "timmetraq-tracker",
+  "productName": "Timmetraq Tracker",
   "version": "1.0.0",
-  "description": "Privacy-first desktop activity metadata tracker for OfficeMate",
+  "description": "Privacy-first desktop activity metadata tracker for Timmetraq",
   "main": "dist/main/index.js",
-  "author": "OfficeMate",
+  "author": "Timmetraq",
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
@@ -36,8 +36,8 @@
     "wait-on": "^8.0.1"
   },
   "build": {
-    "appId": "app.officemate.tracker",
-    "productName": "OfficeMate Tracker",
+    "appId": "app.timmetraq.tracker",
+    "productName": "Timmetraq Tracker",
     "npmRebuild": false,
     "directories": {
       "output": "release"

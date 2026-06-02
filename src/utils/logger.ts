@@ -16,7 +16,7 @@ function minLevel(): number {
 function log(level: Level, ...args: unknown[]): void {
   if (order[level] < minLevel()) return;
   const ts = new Date().toISOString();
-  const line = `[${ts}] [OfficeMate] [${level.toUpperCase()}]`;
+  const line = `[${ts}] [Timmetraq Tracker] [${level.toUpperCase()}]`;
   if (level === 'error') console.error(line, ...args);
   else if (level === 'warn') console.warn(line, ...args);
   else console.log(line, ...args);

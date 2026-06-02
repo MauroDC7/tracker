@@ -22,7 +22,7 @@ export class RemoteApiClient {
   }
 
   /**
-   * Example: POST https://api.officemate.app/api/activity
+   * Example: POST https://timetraq.be/api/activity
    * Body: { "activities": [ { ...ActivityPayload } ] }
    */
   async postActivityBatch(

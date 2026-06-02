@@ -35,7 +35,7 @@ export function openLoginWindow(): BrowserWindow {
     show: false,
     autoHideMenuBar: true,
     backgroundColor: '#f4f4f5',
-    title: 'OfficeMate Tracker — Sign in',
+    title: 'Timmetraq Tracker — Sign in',
     ...(appIcon ? { icon: appIcon } : {}),
     webPreferences: {
       preload,

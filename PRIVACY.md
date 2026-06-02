@@ -1,8 +1,8 @@
-# OfficeMate Tracker — Privacy & GDPR notes
+# Timmetraq Tracker — Privacy & GDPR notes
 
 ## Purpose limitation
 
-OfficeMate Tracker exists to help organizations understand **time spent in applications** for workforce analytics, billing, or compliance workflows. It is **not** designed for covert surveillance: it avoids content capture by design.
+Timmetraq Tracker exists to help organizations understand **time spent in applications** for workforce analytics, billing, or compliance workflows. It is **not** designed for covert surveillance: it avoids content capture by design.
 
 ## Lawful basis (GDPR)
 
@@ -24,7 +24,7 @@ You should record the chosen basis in your Records of Processing Activities and 
 
 ## Why metadata-only is materially safer
 
-| Risky capability | OfficeMate Tracker |
+| Risky capability | Timmetraq Tracker |
 |-------------------|---------------------|
 | Keystroke logging | **Not implemented** |
 | Screenshots / screen recording | **Not implemented** |

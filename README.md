@@ -1,6 +1,6 @@
-# OfficeMate Tracker
+# Timmetraq Tracker
 
-Standalone **privacy-first** desktop activity metadata agent for OfficeMate. It runs in the background, records **which** application and window are in the foreground, then batches that metadata to your Laravel API.
+Standalone **privacy-first** desktop activity metadata agent for Timmetraq. It runs in the background, records **which** application and window are in the foreground, then batches that metadata to your Laravel API.
 
 This repository is intentionally **separate** from the main Laravel codebase.
 
@@ -104,7 +104,7 @@ Copy `.env.example` to `.env` at the project root for local development, or set 
 
 | Variable | Purpose |
 |-----------|---------|
-| `REMOTE_API_BASE_URL` | e.g. `https://api.officemate.app` |
+| `REMOTE_API_BASE_URL` | e.g. `https://timetraq.be` |
 | `REMOTE_ACTIVITY_PATH` | default `/api/activity` |
 | `REMOTE_LOGIN_PATH` | default `/api/login` |
 | `ACTIVE_WINDOW_POLL_MS` | default `5000` |

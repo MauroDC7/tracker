@@ -7,7 +7,7 @@
       content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Timmetraq Tracker — Status</title>
+    <title>Timetraq Tracker — Status</title>
     <style>
       :root {
         --red: #e50012;
@@ -99,7 +99,7 @@
   <body>
     <div class="brand">
       <img src="logo.png" width="28" height="28" alt="" />
-      <h1>Timmetraq Tracker — Status</h1>
+      <h1>Timetraq Tracker — Status</h1>
     </div>
 
     <div class="card">
@@ -114,6 +114,12 @@
       <div class="row"><span class="k">Basis-URL</span><span class="v" id="apiBase">—</span></div>
       <div class="row"><span class="k">Login-pad</span><span class="v" id="loginPath">—</span></div>
       <div class="row"><span class="k">Activity-pad</span><span class="v" id="activityPath">—</span></div>
+    </div>
+
+    <div class="card" id="macAccessCard">
+      <h2>macOS-toestemming</h2>
+      <div class="row"><span class="k">Toegankelijkheid</span><span class="v" id="macAccessPill"></span></div>
+      <p class="hint" id="macAccessHint" style="margin:0;font-size:0.8rem;color:#64748b;line-height:1.45"></p>
     </div>
 
     <div class="card">
@@ -162,6 +168,17 @@
         setText('apiBase', s.apiBaseUrl);
         setText('loginPath', s.loginPath);
         setText('activityPath', s.activityPath);
+
+        var macCard = document.getElementById('macAccessCard');
+        if (s.macAccessibilityGranted === undefined) {
+          macCard.style.display = 'none';
+        } else {
+          macCard.style.display = '';
+          pill('macAccessPill', s.macAccessibilityGranted ? 'ok' : 'err', s.macAccessibilityGranted ? 'Toegestaan' : 'Niet toegestaan');
+          setText('macAccessHint', s.macAccessibilityGranted
+            ? ''
+            : 'Tray → Toegankelijkheid instellen… Zet Timetraq Tracker aan, sluit de app af en start opnieuw.');
+        }
 
         setText('winApp', s.lastWindowAppName);
         setText('winTitle', s.lastWindowTitle);

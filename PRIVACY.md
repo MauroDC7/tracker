@@ -1,8 +1,8 @@
-# Timmetraq Tracker — Privacy & GDPR notes
+# Timetraq Tracker — Privacy & GDPR notes
 
 ## Purpose limitation
 
-Timmetraq Tracker exists to help organizations understand **time spent in applications** for workforce analytics, billing, or compliance workflows. It is **not** designed for covert surveillance: it avoids content capture by design.
+Timetraq Tracker exists to help organizations understand **time spent in applications** for workforce analytics, billing, or compliance workflows. It is **not** designed for covert surveillance: it avoids content capture by design.
 
 ## Lawful basis (GDPR)
 
@@ -24,7 +24,7 @@ You should record the chosen basis in your Records of Processing Activities and 
 
 ## Why metadata-only is materially safer
 
-| Risky capability | Timmetraq Tracker |
+| Risky capability | Timetraq Tracker |
 |-------------------|---------------------|
 | Keystroke logging | **Not implemented** |
 | Screenshots / screen recording | **Not implemented** |

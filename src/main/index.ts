@@ -1,5 +1,5 @@
 /**
- * Timmetraq Tracker — main process bootstrap.
+ * Timetraq Tracker — main process bootstrap.
  *
  * Architecture (MVP):
  * - Foreground window metadata via `active-win` on a fixed poll interval.
@@ -24,7 +24,7 @@ import { openDiagnosticsWindow } from './diagnostics-window';
 import { showMainWindow } from './show-main-window';
 import type { Tray } from 'electron';
 
-export class TimmetraqTrackerApp {
+export class TimetraqTrackerApp {
   private settings: TrackerSettings = loadSettings();
   private readonly queue = new ActivityQueue();
   private readonly auth = new AuthService();
@@ -104,7 +104,7 @@ export class TimmetraqTrackerApp {
     }
 
     logger.info(
-      `Timmetraq Tracker started — API ${env.remoteApiBaseUrl}${env.remoteLoginPath}`,
+      `Timetraq Tracker started — API ${env.remoteApiBaseUrl}${env.remoteLoginPath}`,
     );
   }
 
@@ -159,7 +159,7 @@ const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
   app.quit();
 } else {
-  let core: TimmetraqTrackerApp | null = null;
+  let core: TimetraqTrackerApp | null = null;
   let isQuitting = false;
 
   app.on('second-instance', () => {
@@ -198,7 +198,7 @@ if (!gotLock) {
       Menu.setApplicationMenu(
         Menu.buildFromTemplate([
           {
-            label: 'Timmetraq Tracker',
+            label: 'Timetraq Tracker',
             submenu: [
               {
                 label: 'Status openen',
@@ -223,11 +223,11 @@ if (!gotLock) {
       if (!isMacAccessibilityTrusted()) {
         logger.warn(
           'macOS: Toegankelijkheid niet actief. Tray → "Toegankelijkheid instellen…" ' +
-            'of Systeeminstellingen → Privacy → Toegankelijkheid → Timmetraq Tracker.',
+            'of Systeeminstellingen → Privacy → Toegankelijkheid → Timetraq Tracker.',
         );
       }
     }
-    core = new TimmetraqTrackerApp();
+    core = new TimetraqTrackerApp();
     await core.start();
   });
 

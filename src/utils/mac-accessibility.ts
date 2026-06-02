@@ -1,4 +1,4 @@
-import { systemPreferences } from 'electron';
+import { shell, systemPreferences } from 'electron';
 
 /** Of macOS Toegankelijkheid is verleend (nodig voor active-win / venstertitels). */
 export function isMacAccessibilityTrusted(): boolean {
@@ -7,10 +7,17 @@ export function isMacAccessibilityTrusted(): boolean {
 }
 
 /**
- * Opent het macOS-dialoog + Systeeminstellingen.
- * Alleen aanroepen op gebruikersactie — nooit bij elke app-start (veroorzaakt anders een loop).
+ * Opent Systeeminstellingen → Toegankelijkheid.
+ * Gebruik NOOIT isTrustedAccessibilityClient(true) — dat toont steeds opnieuw het systeemdialoog.
  */
-export function promptMacAccessibilitySettings(): void {
+export function openMacAccessibilitySettings(): void {
   if (process.platform !== 'darwin') return;
-  systemPreferences.isTrustedAccessibilityClient(true);
+  void shell.openExternal(
+    'x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Accessibility',
+  );
+}
+
+/** Tray-actie: alleen instellingen openen, geen Electron-prompt. */
+export function promptMacAccessibilitySettings(): void {
+  openMacAccessibilitySettings();
 }

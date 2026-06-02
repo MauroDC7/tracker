@@ -9,6 +9,7 @@
  */
 
 import { EventEmitter } from 'node:events';
+import { isMacAccessibilityTrusted } from '../utils/mac-accessibility';
 
 export interface DiagnosticsSnapshot {
   authenticated: boolean;
@@ -28,6 +29,9 @@ export interface DiagnosticsSnapshot {
   lastSyncCount: number;
 
   trackingEnabled: boolean;
+
+  /** macOS: Toegankelijkheid voor venster-tracking (live check). */
+  macAccessibilityGranted: boolean;
 }
 
 export class DiagnosticsService extends EventEmitter {
@@ -53,11 +57,15 @@ export class DiagnosticsService extends EventEmitter {
       lastSyncCount: 0,
 
       trackingEnabled: true,
+      macAccessibilityGranted: true,
     };
   }
 
   get(): DiagnosticsSnapshot {
-    return { ...this.snap };
+    return {
+      ...this.snap,
+      macAccessibilityGranted: isMacAccessibilityTrusted(),
+    };
   }
 
   private update(partial: Partial<DiagnosticsSnapshot>): void {

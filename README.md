@@ -1,6 +1,6 @@
-# Timmetraq Tracker
+# Timetraq Tracker
 
-Standalone **privacy-first** desktop activity metadata agent for Timmetraq. It runs in the background, records **which** application and window are in the foreground, then batches that metadata to your Laravel API.
+Standalone **privacy-first** desktop activity metadata agent for Timetraq. It runs in the background, records **which** application and window are in the foreground, then batches that metadata to your Laravel API.
 
 This repository is intentionally **separate** from the main Laravel codebase.
 

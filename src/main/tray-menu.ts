@@ -35,7 +35,7 @@ export function createTray(deps: TrayControllerDeps): TrayController {
   const icon: NativeImage = loadTrayIcon();
 
   const tray = new Tray(icon);
-  tray.setToolTip('Timmetraq Tracker');
+  tray.setToolTip('Timetraq Tracker');
 
   // Linkerklik: hoofdvenster. Rechtsklik: menu.
   tray.on('click', () => {
@@ -64,7 +64,7 @@ export function createTray(deps: TrayControllerDeps): TrayController {
     const queueLabel = `Wachtrij: ${s.queueSize}`;
 
     const menu = Menu.buildFromTemplate([
-      { label: 'Timmetraq Tracker', enabled: false },
+      { label: 'Timetraq Tracker', enabled: false },
       { type: 'separator' },
       { label: statusLabel, enabled: false },
       { label: queueLabel, enabled: false },
@@ -119,7 +119,7 @@ export function createTray(deps: TrayControllerDeps): TrayController {
     tray.setContextMenu(menu);
 
     tray.setToolTip(
-      `Timmetraq Tracker — ${s.authenticated ? 'ingelogd' : 'niet ingelogd'}, wachtrij ${s.queueSize}`,
+      `Timetraq Tracker — ${s.authenticated ? 'ingelogd' : 'niet ingelogd'}, wachtrij ${s.queueSize}`,
     );
   };
 

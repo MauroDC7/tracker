@@ -1,10 +1,10 @@
 {
-  "name": "timmetraq-tracker",
-  "productName": "Timmetraq Tracker",
+  "name": "timetraq-tracker",
+  "productName": "Timetraq Tracker",
   "version": "1.0.0",
-  "description": "Privacy-first desktop activity metadata tracker for Timmetraq",
+  "description": "Privacy-first desktop activity metadata tracker for Timetraq",
   "main": "dist/main/index.js",
-  "author": "Timmetraq",
+  "author": "Timetraq",
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
@@ -36,8 +36,8 @@
     "wait-on": "^8.0.1"
   },
   "build": {
-    "appId": "app.timmetraq.tracker",
-    "productName": "Timmetraq Tracker",
+    "appId": "app.timetraq.tracker",
+    "productName": "Timetraq Tracker",
     "npmRebuild": false,
     "directories": {
       "output": "release"

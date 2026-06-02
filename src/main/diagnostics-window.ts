@@ -26,7 +26,7 @@ export function openDiagnosticsWindow(): BrowserWindow {
     height: 720,
     show: false,
     autoHideMenuBar: true,
-    title: 'Timmetraq Tracker — Status',
+    title: 'Timetraq Tracker — Status',
     ...(appIcon ? { icon: appIcon } : {}),
     webPreferences: {
       preload,

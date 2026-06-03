@@ -23,7 +23,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "active-win": "^7.7.2",
+    "active-win": "^9.0.0",
     "axios": "^1.7.9"
   },
   "devDependencies": {
@@ -39,6 +39,7 @@
     "appId": "app.timetraq.tracker",
     "productName": "Timetraq Tracker",
     "npmRebuild": false,
+    "afterPack": "scripts/after-pack-mac.js",
     "directories": {
       "output": "release"
     },
